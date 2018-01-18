@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Tankiller
+namespace Tankiller.src
 {
-    class Missile : Entity
+    public enum Direction
     {
+        TOP, BOT, RIGHT, LEFT
     }
 }

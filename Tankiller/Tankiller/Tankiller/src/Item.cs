@@ -5,7 +5,11 @@ using System.Text;
 
 namespace Tankiller
 {
-    class Item : Entity
+    public class Item : Entity
     {
+        public Item(int x, int y)
+        {
+            base(x, y);
+        }
     }
 }

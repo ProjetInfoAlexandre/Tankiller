@@ -5,8 +5,11 @@ using System.Text;
 
 namespace Tankiller
 {
-    class Wall : Entity
+    public class Missile : Entity
     {
-        Boolean breakable { get; set; }
+        public Missile(int x, int y)
+        {
+            base(x, y);
+        }
     }
 }

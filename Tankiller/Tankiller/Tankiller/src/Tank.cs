@@ -5,8 +5,17 @@ using System.Text;
 
 namespace Tankiller
 {
-    class Tank : Entity
+    public class Tank : Entity
     {
+        public Tank(int x , int y)
+        {
+            base(x, y);
+        }
+
+        public void move()
+        {
+
+        }
         public void shoot()
         {
 
