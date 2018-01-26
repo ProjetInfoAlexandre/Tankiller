@@ -14,12 +14,16 @@ namespace Tankiller
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Tankiller : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        public Game1()
+        private Vector2 mouse_location;
+
+        private Texture2D tank;
+
+        public Tankiller()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -36,6 +40,13 @@ namespace Tankiller
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+			//taille fenetre
+            graphics.PreferredBackBufferWidth = 720;
+            graphics.PreferredBackBufferWidth = 480;
+
+			//visibilité souris
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -48,6 +59,7 @@ namespace Tankiller
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            //tank = this.Content.Load<Texture2D>("tank");
         }
 
         /// <summary>
@@ -67,11 +79,55 @@ namespace Tankiller
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            KeyboardState keyboard_state = Keyboard.GetState();
+            if (keyboard_state.IsKeyDown(Keys.Escape)) this.Exit();
 
             // TODO: Add your update logic here
+            if (keyboard_state.IsKeyDown(Keys.Left))
+            {
+                //Joueur2 gauche
+            }
+            else if (keyboard_state.IsKeyDown(Keys.Right))
+            {
+                //Joueur2 droite
+            }
+            else if (keyboard_state.IsKeyDown(Keys.Up))
+            {
+                //Joueur2 haut
+            }
+            else if (keyboard_state.IsKeyDown(Keys.Down))
+            {
+                //Joueur2 bas
+            }
 
+            if (keyboard_state.IsKeyDown(Keys.Q))
+            {
+                //Joueur1 gauche
+            }
+            else if (keyboard_state.IsKeyDown(Keys.D))
+            {
+                //Joueur1 droite
+            }
+            else if (keyboard_state.IsKeyDown(Keys.Z))
+            {
+                //Joueur1 haut
+            }
+            else if (keyboard_state.IsKeyDown(Keys.S))
+            {
+                //Joueur1 bas
+            }
+
+
+
+            MouseState mouse_state = Mouse.GetState();
+
+            if (mouse_state.LeftButton == ButtonState.Pressed)
+            {
+				
+            }
+
+
+			//A LAISSER (par defaut)
             base.Update(gameTime);
         }
 
@@ -81,9 +137,14 @@ namespace Tankiller
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
+            //spriteBatch.Begin();
+            //spritBatch.draw
+            //spriteBatch.End();
+
+            //Console.WriteLine(Tank.getTank().getX());
 
             base.Draw(gameTime);
         }

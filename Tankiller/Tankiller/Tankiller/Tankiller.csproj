@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <None Include="Tankiller" />
+    <Compile Include="Tankiller.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
