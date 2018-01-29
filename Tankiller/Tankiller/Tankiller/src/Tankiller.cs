@@ -14,15 +14,28 @@ namespace Tankiller
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Tankiller : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        public Game1()
+        private Texture2D tank1 = null;
+        private Texture2D tank2 = null;
+        private Texture2D wall = null;
+
+        private src.Game game = null;
+
+        public Tankiller()
         {
+            game = new src.Game(20, 20);
+
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = game.Width * 40;
+            graphics.PreferredBackBufferHeight = game.Width * 40;
+
             Content.RootDirectory = "Content";
+
+            
         }
 
         /// <summary>
@@ -36,6 +49,8 @@ namespace Tankiller
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -48,6 +63,9 @@ namespace Tankiller
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            tank1 = Content.Load<Texture2D>("tank1");
+            tank2 = Content.Load<Texture2D>("tank2");
+            wall = Content.Load<Texture2D>("mur");
         }
 
         /// <summary>
@@ -66,12 +84,32 @@ namespace Tankiller
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            MouseState mouseState = Mouse.GetState();
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            //Quitter
+            if (keyboardState.IsKeyDown(Keys.Escape)) this.Exit();
 
             // TODO: Add your update logic here
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                game.Tank1.Direction = src.Direction.TOP;
+            }
+            else if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                game.Tank1.Direction = src.Direction.BOT;
+            }
+            else if (keyboardState.IsKeyDown(Keys.Left))
+            {
+                game.Tank1.Direction = src.Direction.LEFT;
+            }
+            else if (keyboardState.IsKeyDown(Keys.Right))
+            {
+                game.Tank1.Direction = src.Direction.RIGHT;
+            }
 
+
+            //LAISSER ABSOLUEMENT
             base.Update(gameTime);
         }
 
@@ -81,9 +119,66 @@ namespace Tankiller
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
+            int width = GraphicsDevice.Viewport.Width;
+            int height = GraphicsDevice.Viewport.Height;
+
+
+
+            spriteBatch.Begin();
+
+            Rectangle position = new Rectangle();
+            position.Width = width / game.Width;
+            position.Height = height / game.Height;
+
+            for (int i = 0; i < game.Width; ++i)
+            {
+                for (int j = 0; j < game.Height; ++j)
+                {
+                    Entity e = game.getEntity(i, j);
+
+
+                    if (e == null) continue;
+
+                    position.X = i * position.Width;
+                    position.Y = j * position.Height;
+
+                    if (e is Wall)
+                    {
+                        spriteBatch.Draw(wall, position, Color.White);
+                    }
+                    else if (e is Tank)
+                    {
+                        float rotation = 0;
+                        switch (((Tank)e).Direction)
+                        {
+                            case (src.Direction.BOT):
+                                rotation = (float)Math.PI;
+                                break;
+
+                            case (src.Direction.LEFT):
+                                rotation = (float)Math.PI / -2;
+                                break;
+
+                            case (src.Direction.RIGHT):
+                                rotation = (float)Math.PI / 2;
+                                break;
+                        }
+
+                        Vector2 origin = new Vector2(tank1.Width / 2, tank1.Height / 2);
+                        //petit fix (ça commence...)
+                        position.Location = position.Center;
+
+                        spriteBatch.Draw(tank1, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
+                    }
+                }
+            }
+
+            spriteBatch.End();
+
+
 
             base.Draw(gameTime);
         }

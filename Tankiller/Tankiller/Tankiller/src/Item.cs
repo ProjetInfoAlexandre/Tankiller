@@ -7,9 +7,9 @@ namespace Tankiller
 {
     public class Item : Entity
     {
-        public Item(int x, int y)
+        public Item(int x, int y) : base(x, y)
         {
-            base(x, y);
+            
         }
     }
 }

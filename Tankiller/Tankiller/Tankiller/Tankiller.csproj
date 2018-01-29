@@ -58,7 +58,14 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Tankiller.cs" />
+    <Compile Include="src\Direction.cs" />
+    <Compile Include="src\Entity.cs" />
+    <Compile Include="src\Game.cs" />
+    <Compile Include="src\Item.cs" />
+    <Compile Include="src\Missile.cs" />
+    <Compile Include="src\Tank.cs" />
+    <Compile Include="src\Tankiller.cs" />
+    <Compile Include="src\Wall.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

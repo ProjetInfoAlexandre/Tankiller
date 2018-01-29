@@ -9,9 +9,8 @@ namespace Tankiller
     {
         bool breakable { get; set; }
 
-        public Wall(int x, int y, bool breakable)
+        public Wall(int x, int y, bool breakable) : base(x, y)
         {
-            base(x, y);
             this.breakable = breakable;
         }
     }

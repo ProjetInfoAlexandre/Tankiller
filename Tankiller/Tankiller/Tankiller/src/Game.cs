@@ -8,16 +8,21 @@ namespace Tankiller.src
     public class Game
     {
         private Entity[][] entities;
+        public Tank Tank1 { get; }
 
-        private int width { get; }
+        public int Width { get; }
 
-        private int height { get; }
+        public int Height { get; }
 
         private List<Missile> missiles = new List<Missile>();
         public Game(int width, int height)
         {
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
+
+            //init comme en c/c++
+            entities = new Entity[width][];
+            for (int i = 0; i < width; ++i) entities[i] = new Entity[height];
 
             for(int i = 0; i < width; ++i)
             {
@@ -33,8 +38,15 @@ namespace Tankiller.src
                     }
                 }
             }
-            entities[1][1] = new Tank(1, 1);
+
+            entities[1][1] = Tank1 = new Tank(1, 1);
             entities[2][2] = new Wall(2, 2, true);
+        }
+
+        public Entity getEntity(int x, int y)
+        {
+            if (x < 0 || x >= Width || y < 0 || y >= Height) return null;
+            return entities[x][y];
         }
 
         public void shootMissile(int x, int y, Tank tank)

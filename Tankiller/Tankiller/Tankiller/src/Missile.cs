@@ -7,9 +7,9 @@ namespace Tankiller
 {
     public class Missile : Entity
     {
-        public Missile(int x, int y)
+        public Missile(int x, int y) : base(x, y)
         {
-            base(x, y);
+            
         }
     }
 }
