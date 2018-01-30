@@ -7,8 +7,9 @@ namespace Tankiller.src
 {
     public class Game
     {
-        private Entity[][] entities;
-        public Tank Tank1 { get; }
+        private List<Tank> tanks;
+
+        private List<Wall> walls;
 
         public int Width { get; }
 
@@ -21,32 +22,28 @@ namespace Tankiller.src
             this.Height = height;
 
             //init comme en c/c++
-            entities = new Entity[width][];
-            for (int i = 0; i < width; ++i) entities[i] = new Entity[height];
+            tanks = new List<Tank>();
+            tanks.Add(new Tank(1, 1, this));
 
-            for(int i = 0; i < width; ++i)
+            walls = new List<Wall>();
+
+            for (int i = 0; i < height; ++i)
             {
-                for(int j = 0; j < height; ++j)
+                for (int j = 0; j < width; ++j)
                 {
-                    if (i == width - 1 || j * i == 0 || j == height - 1)
-                    {
-                        entities[i][j] = new Wall(i, j, false);
-                    }
-                    else
-                    {
-                        entities[i][j] = null;
-                    }
+                    walls.Add(new Wall(j, i, false, this));
                 }
             }
-
-            entities[1][1] = Tank1 = new Tank(1, 1);
-            entities[2][2] = new Wall(2, 2, true);
         }
 
-        public Entity getEntity(int x, int y)
+        public List<Tank> getTanks()
         {
-            if (x < 0 || x >= Width || y < 0 || y >= Height) return null;
-            return entities[x][y];
+            return tanks;
+        }
+
+        public List<Wall> getWalls()
+        {
+            return walls;
         }
 
         public void shootMissile(int x, int y, Tank tank)

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Tankiller
+namespace Tankiller.src
 {
     public class Wall : Entity
     {
         bool breakable { get; set; }
 
-        public Wall(int x, int y, bool breakable) : base(x, y)
+        public Wall(int x, int y, bool breakable, Game myGame) : base(x, y, myGame)
         {
             this.breakable = breakable;
         }

@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Tankiller
+namespace Tankiller.src
 {
     public class Entity
     {
-        private int x { get; set; }
-        private int y { get; set; }
+        protected int x { get; set; }
+        protected int y { get; set; }
 
-        public Entity(int x, int y)
+        protected Game myGame;
+
+        public Entity(int x, int y, Game myGame)
         {
             this.x = x;
             this.y = y;
+            this.myGame = myGame;
         }
 
     }
