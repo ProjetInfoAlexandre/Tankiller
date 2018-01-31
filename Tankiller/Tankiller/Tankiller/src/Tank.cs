@@ -30,48 +30,15 @@ namespace Tankiller
 
             foreach(Tank t in tanks)
             {
-                switch(d)
-                {
-                    case Direction.BOT:
-                        if (t.X == Y - 1)
-                            canMove = false;
-                        break;
-                    case Direction.TOP:
-                        if (t.X == Y + 1)
-                            canMove = false;
-                        break;
-                    case Direction.RIGHT:
-                        if (t.X == X + 1)
-                            canMove = false;
-                        break;
-                    case Direction.LEFT:
-                        if (t.X == X - 1)
-                            canMove = false;
-                        break;
-                }
+                if (t == this) continue;
+                if (X == t.X + d.GetModX() && Y == t.Y + d.GetModY())
+                    canMove = false;
             }
 
             foreach (Wall w in walls)
             {
-                switch (d)
-                {
-                    case Direction.BOT:
-                        if (w.X == Y - 1)
-                            canMove = false;
-                        break;
-                    case Direction.TOP:
-                        if (w.X == Y + 1)
-                            canMove = false;
-                        break;
-                    case Direction.RIGHT:
-                        if (w.X == X + 1)
-                            canMove = false;
-                        break;
-                    case Direction.LEFT:
-                        if (w.X == X - 1)
-                            canMove = false;
-                        break;
-                }
+                if (X == w.X + d.GetModX() && Y == w.Y + d.GetModY())
+                    canMove = false;
             }
 
             switch (d)
