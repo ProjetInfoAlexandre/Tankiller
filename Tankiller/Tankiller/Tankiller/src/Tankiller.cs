@@ -35,7 +35,6 @@ namespace Tankiller
 
             Content.RootDirectory = "Content";
 
-            
         }
 
         /// <summary>

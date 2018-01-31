@@ -36,17 +36,17 @@ namespace Tankiller.src
             }
         }
 
-        public List<Tank> getTanks()
+        public List<Tank> GetTanks()
         {
             return tanks;
         }
 
-        public List<Wall> getWalls()
+        public List<Wall> GetWalls()
         {
             return walls;
         }
 
-        public void shootMissile(int x, int y, Tank tank)
+        public void ShootMissile(int x, int y, Tank tank)
         {
 
         }

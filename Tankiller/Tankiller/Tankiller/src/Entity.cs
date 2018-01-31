@@ -7,8 +7,8 @@ namespace Tankiller.src
 {
     public class Entity
     {
-        protected int x { get; set; }
-        protected int y { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
 
         protected Game myGame;
 
