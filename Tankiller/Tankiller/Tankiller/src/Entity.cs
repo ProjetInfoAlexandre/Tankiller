@@ -7,15 +7,15 @@ namespace Tankiller.src
 {
     public class Entity
     {
-        public int x { get; set; }
-        public int y { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
 
         protected Game myGame;
 
         public Entity(int x, int y, Game myGame)
         {
-            this.x = x;
-            this.y = y;
+            this.X = x;
+            this.Y = y;
             this.myGame = myGame;
         }
 

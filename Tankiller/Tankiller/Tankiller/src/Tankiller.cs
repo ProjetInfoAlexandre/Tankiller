@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Tankiller.src;
 
 namespace Tankiller
 {
@@ -92,19 +93,19 @@ namespace Tankiller
             // TODO: Add your update logic here
             if (keyboardState.IsKeyDown(Keys.Up))
             {
-                game.Tank1.Direction = src.Direction.TOP;
+                game.GetTanks()[0].Direction = src.Direction.TOP;
             }
             else if (keyboardState.IsKeyDown(Keys.Down))
             {
-                game.Tank1.Direction = src.Direction.BOT;
+                game.GetTanks()[0].Direction = src.Direction.BOT;
             }
             else if (keyboardState.IsKeyDown(Keys.Left))
             {
-                game.Tank1.Direction = src.Direction.LEFT;
+                game.GetTanks()[0].Direction = src.Direction.LEFT;
             }
             else if (keyboardState.IsKeyDown(Keys.Right))
             {
-                game.Tank1.Direction = src.Direction.RIGHT;
+                game.GetTanks()[0].Direction = src.Direction.RIGHT;
             }
 
 
@@ -132,47 +133,40 @@ namespace Tankiller
             position.Width = width / game.Width;
             position.Height = height / game.Height;
 
-            for (int i = 0; i < game.Width; ++i)
+            foreach (Wall wall in game.GetWalls())
             {
-                for (int j = 0; j < game.Height; ++j)
+                position.X = wall.X * position.Width;
+                position.Y = wall.Y * position.Height;
+
+                spriteBatch.Draw(this.wall, position, Color.White);
+            }
+                   
+            foreach (Tank tank in game.GetTanks())
+            {
+                position.X = tank.X * position.Width;
+                position.Y = tank.Y * position.Height;
+
+                float rotation = 0;
+                switch (tank.Direction)
                 {
-                    Entity e = game.getEntity(i, j);
+                    case (src.Direction.BOT):
+                        rotation = (float)Math.PI;
+                        break;
 
+                    case (src.Direction.LEFT):
+                        rotation = (float)Math.PI / -2;
+                        break;
 
-                    if (e == null) continue;
-
-                    position.X = i * position.Width;
-                    position.Y = j * position.Height;
-
-                    if (e is Wall)
-                    {
-                        spriteBatch.Draw(wall, position, Color.White);
-                    }
-                    else if (e is Tank)
-                    {
-                        float rotation = 0;
-                        switch (((Tank)e).Direction)
-                        {
-                            case (src.Direction.BOT):
-                                rotation = (float)Math.PI;
-                                break;
-
-                            case (src.Direction.LEFT):
-                                rotation = (float)Math.PI / -2;
-                                break;
-
-                            case (src.Direction.RIGHT):
-                                rotation = (float)Math.PI / 2;
-                                break;
-                        }
-
-                        Vector2 origin = new Vector2(tank1.Width / 2, tank1.Height / 2);
-                        //petit fix (ça commence...)
-                        position.Location = position.Center;
-
-                        spriteBatch.Draw(tank1, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
-                    }
+                    case (src.Direction.RIGHT):
+                        rotation = (float)Math.PI / 2;
+                        break;
                 }
+
+                Vector2 origin = new Vector2(tank1.Width / 2, tank1.Height / 2);
+                //petit fix (ça commence...)
+                position.Location = position.Center;
+
+                spriteBatch.Draw(tank1, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
             }
 
             spriteBatch.End();

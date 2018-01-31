@@ -7,9 +7,9 @@ namespace Tankiller.src
 {
     public class Game
     {
-        private List<Tank> tanks;
+        private List<Tank> tanks = new List<Tank>();
 
-        private List<Wall> walls;
+        private List<Wall> walls = new List<Wall>();
 
         public int Width { get; }
 
@@ -21,11 +21,7 @@ namespace Tankiller.src
             this.Width = width;
             this.Height = height;
 
-            //init comme en c/c++
-            tanks = new List<Tank>();
             tanks.Add(new Tank(1, 1, this));
-
-            walls = new List<Wall>();
 
             for (int i = 0; i < height; ++i)
             {

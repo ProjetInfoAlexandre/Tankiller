@@ -8,16 +8,16 @@ namespace Tankiller
 {
     public class Tank : Entity
     {
-        public Direction direction { get; set; }
+        public Direction Direction { get; set; }
 
         public Tank(int x , int y, Game myGame) : base(x, y, myGame)
         {
-            direction = Direction.TOP;
+            Direction = Direction.TOP;
         }
 
         public void Shoot()
         {
-            new Missile(x, y,direction,  myGame, this);
+            new Missile(X, Y,Direction,  myGame, this);
         }
 
         public void Move(Direction d)
@@ -30,49 +30,49 @@ namespace Tankiller
 
             foreach (Tank t in tanks)
             {
-                if (t.x == this.x - 1 && t.y == this.y)
+                if (t.X == this.X - 1 && t.Y == this.Y)
                 {
                     left = false;
-                    direction = Direction.LEFT;
+                    Direction = Direction.LEFT;
                 }
-                else if (t.x == this.x + 1 && t.y == this.y)
+                else if (t.X == this.X + 1 && t.Y == this.Y)
                 {
                     right = false;
-                    direction = Direction.RIGHT;
+                    Direction = Direction.RIGHT;
                 }
-                else if (t.x == this.x && t.y == this.y - 1)
+                else if (t.X == this.X && t.Y == this.Y - 1)
                 {
                     bot = false;
-                    direction = Direction.BOT;
+                    Direction = Direction.BOT;
                 }
-                else if (t.x == this.x && t.y == this.y + 1)
+                else if (t.X == this.X && t.Y == this.Y + 1)
                 {
                     top = false;
-                    direction = Direction.TOP;
+                    Direction = Direction.TOP;
                 }
             }
 
             foreach(Wall w in walls)
             {
-                if (w.x == this.x - 1 && w.y == this.y)
+                if (w.X == this.X - 1 && w.Y == this.Y)
                 {
                     left = false;
-                    direction = Direction.LEFT;
+                    Direction = Direction.LEFT;
                 }
-                else if (w.x == this.x + 1 && w.y == this.y)
+                else if (w.X == this.X + 1 && w.Y == this.Y)
                 {
                     right = false;
-                    direction = Direction.RIGHT;
+                    Direction = Direction.RIGHT;
                 }
-                else if (w.x == this.x && w.y == this.y - 1)
+                else if (w.X == this.X && w.Y == this.Y - 1)
                 {
                     bot = false;
-                    direction = Direction.BOT;
+                    Direction = Direction.BOT;
                 }
-                else if (w.x == this.x && w.y == this.y + 1)
+                else if (w.X == this.X && w.Y == this.Y + 1)
                 {
                     top = false;
-                    direction = Direction.TOP;
+                    Direction = Direction.TOP;
                 }
             }
 
@@ -81,33 +81,33 @@ namespace Tankiller
                 case Direction.BOT:
                     if(bot)
                     {
-                        this.y++;
+                        this.Y++;
                     }
                     break;
 
                 case Direction.RIGHT:
                     if(right)
                     {
-                        this.x++;
+                        this.X++;
                     }
                     break;
 
                 case Direction.TOP:
                     if(top)
                     {
-                        this.y--;
+                        this.Y--;
                     }
                     break;
 
                 case Direction.LEFT:
                     if(left)
                     {
-                        this.x--;
+                        this.X--;
                     }
                     break;
             }
 
-            Tankiller.Update();
+            //Tankiller.Update();
         }
     }
 }
