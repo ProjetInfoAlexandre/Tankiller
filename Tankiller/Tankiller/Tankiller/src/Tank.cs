@@ -26,50 +26,28 @@ namespace Tankiller
             List<Tank> tanks = myGame.GetTanks();
             List<Wall> walls = myGame.GetWalls();
 
-            Boolean canMove = true;
-
             foreach(Tank t in tanks)
             {
                 if (t == this) continue;
-                if (X == t.X + d.GetModX() && Y == t.Y + d.GetModY())
-                    canMove = false;
+                if (t.X == X + d.GetModX() && t.Y == Y + d.GetModY())
+                    return;
             }
 
             foreach (Wall w in walls)
             {
-                if (X == w.X + d.GetModX() && Y == w.Y + d.GetModY())
-                    canMove = false;
+                if (w.Y == Y + d.GetModX() && w.Y == Y + d.GetModY())
+                    return;
             }
 
             switch (d)
             {
-                case Direction.BOT:
-                    if(canMove)
-                    {
-                        this.Y++;
-                    }
-                    break;
+                case Direction.BOT: this.Y++; break;
 
-                case Direction.RIGHT:
-                    if(canMove)
-                    {
-                        this.X++;
-                    }
-                    break;
+                case Direction.RIGHT: this.X++; break;
 
-                case Direction.TOP:
-                    if(canMove)
-                    {
-                        this.Y--;
-                    }
-                    break;
+                case Direction.TOP: this.Y--; break;
 
-                case Direction.LEFT:
-                    if(canMove)
-                    {
-                        this.X--;
-                    }
-                    break;
+                case Direction.LEFT: this.X--; break;
             }
 
             //Tankiller.Update();
