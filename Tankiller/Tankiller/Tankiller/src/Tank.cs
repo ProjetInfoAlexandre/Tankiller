@@ -26,81 +26,79 @@ namespace Tankiller
             List<Tank> tanks = myGame.GetTanks();
             List<Wall> walls = myGame.GetWalls();
 
-            Boolean right = true, left = true, top = true, bot = true;
+            Boolean canMove = true;
 
-            foreach (Tank t in tanks)
+            foreach(Tank t in tanks)
             {
-                if (t.X == this.X - 1 && t.Y == this.Y)
+                switch(d)
                 {
-                    left = false;
-                    Direction = Direction.LEFT;
-                }
-                else if (t.X == this.X + 1 && t.Y == this.Y)
-                {
-                    right = false;
-                    Direction = Direction.RIGHT;
-                }
-                else if (t.X == this.X && t.Y == this.Y - 1)
-                {
-                    bot = false;
-                    Direction = Direction.BOT;
-                }
-                else if (t.X == this.X && t.Y == this.Y + 1)
-                {
-                    top = false;
-                    Direction = Direction.TOP;
+                    case Direction.BOT:
+                        if (t.X == Y - 1)
+                            canMove = false;
+                        break;
+                    case Direction.TOP:
+                        if (t.X == Y + 1)
+                            canMove = false;
+                        break;
+                    case Direction.RIGHT:
+                        if (t.X == X + 1)
+                            canMove = false;
+                        break;
+                    case Direction.LEFT:
+                        if (t.X == X - 1)
+                            canMove = false;
+                        break;
                 }
             }
 
-            foreach(Wall w in walls)
+            foreach (Wall w in walls)
             {
-                if (w.X == this.X - 1 && w.Y == this.Y)
+                switch (d)
                 {
-                    left = false;
-                    Direction = Direction.LEFT;
-                }
-                else if (w.X == this.X + 1 && w.Y == this.Y)
-                {
-                    right = false;
-                    Direction = Direction.RIGHT;
-                }
-                else if (w.X == this.X && w.Y == this.Y - 1)
-                {
-                    bot = false;
-                    Direction = Direction.BOT;
-                }
-                else if (w.X == this.X && w.Y == this.Y + 1)
-                {
-                    top = false;
-                    Direction = Direction.TOP;
+                    case Direction.BOT:
+                        if (w.X == Y - 1)
+                            canMove = false;
+                        break;
+                    case Direction.TOP:
+                        if (w.X == Y + 1)
+                            canMove = false;
+                        break;
+                    case Direction.RIGHT:
+                        if (w.X == X + 1)
+                            canMove = false;
+                        break;
+                    case Direction.LEFT:
+                        if (w.X == X - 1)
+                            canMove = false;
+                        break;
                 }
             }
 
             switch (d)
             {
                 case Direction.BOT:
-                    if(bot)
+                    if(canMove)
                     {
                         this.Y++;
                     }
                     break;
 
                 case Direction.RIGHT:
-                    if(right)
+                    if(canMove)
                     {
                         this.X++;
                     }
                     break;
 
                 case Direction.TOP:
-                    if(top)
+                    if(canMove)
                     {
                         this.Y--;
                     }
                     break;
 
                 case Direction.LEFT:
-                    if(left)
+                    if(canMove)
                     {
                         this.X--;
                     }

@@ -27,7 +27,13 @@ namespace Tankiller.src
             {
                 for (int j = 0; j < width; ++j)
                 {
-                    walls.Add(new Wall(j, i, false, this));
+                    if (i == 0 || j == 0 || i == height - 1 || j == width)
+                        walls.Add(new Wall(j, i, false, this));
+                    else
+                    {
+                        if(i != 1 && j != 1)
+                            walls.Add(new Wall(j, i, true, this));
+                    }
                 }
             }
         }
