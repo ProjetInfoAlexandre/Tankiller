@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -8,34 +9,51 @@ namespace Tankiller.src
     public class Game
     {
         private List<Tank> tanks = new List<Tank>();
-
+        private List<Bomb> bombs = new List<Bomb>();
         private List<Wall> walls = new List<Wall>();
 
         public int Width { get; }
 
         public int Height { get; }
 
-        private List<Missile> missiles = new List<Missile>();
+        public Stopwatch timer = new Stopwatch();
+
+        private List<Bomb> missiles = new List<Bomb>();
         public Game(int width, int height)
         {
+            if (width < 3) width = 3;
+            if (height < 3) height = 3;
+
             this.Width = width;
             this.Height = height;
 
-            tanks.Add(new Tank(1, 1, this));
+            Tank t = new Tank(1, height / 2, this);
+            t.Direction = Direction.RIGHT;
+            tanks.Add(t);
+
+            t = new Tank(width - 2, height / 2, this);
+            t.Direction = Direction.LEFT;
+            tanks.Add(t);
 
             for (int i = 0; i < height; ++i)
             {
                 for (int j = 0; j < width; ++j)
                 {
-                    if (i == 0 || j == 0 || i == height - 1 || j == width)
-                        walls.Add(new Wall(j, i, false, this));
-                    else
-                    {
-                        if(i != 1 && j != 1)
-                            walls.Add(new Wall(j, i, true, this));
-                    }
+                    if ((i == 1 || i == width - 2) && j == height / 2) continue;
+                    if ((i == 2 || i == width - 3) && j == height / 2) continue;
+                    if ((i == 1 || i == width - 2) && (j == width / 2 + 1 || j == width / 2 - 1)) continue;
+                    
+
+                    walls.Add(new Wall(i, j, i != 0 && i != width - 1 && j != 0 && j != height - 1, this));
                 }
             }
+
+            timer.Start();
+        }
+
+        ~Game()
+        {
+            timer.Stop();
         }
 
         public List<Tank> GetTanks()
@@ -48,9 +66,20 @@ namespace Tankiller.src
             return walls;
         }
 
-        public void ShootMissile(int x, int y, Tank tank)
+        public List<Bomb> GetBombs()
         {
+            return bombs;
+        }
 
+        public Bomb PlaceBomb(int x, int y, Tank tank)
+        {
+            foreach (Bomb b in bombs) if (b.X == x && b.Y == y) return null;
+
+            Bomb bomb = new Bomb(x, y, this, tank, timer.ElapsedMilliseconds, 3000);
+
+            bombs.Add(bomb);
+
+            return bomb;
         }
     }
 }

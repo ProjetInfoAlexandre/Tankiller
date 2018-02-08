@@ -7,11 +7,20 @@ namespace Tankiller.src
 {
     public class Wall : Entity
     {
-        bool breakable { get; set; }
+        public bool Breakable { get; set; }
 
         public Wall(int x, int y, bool breakable, Game myGame) : base(x, y, myGame)
         {
-            this.breakable = breakable;
+            this.Breakable = breakable;
+        }
+
+        public void Destroy()
+        {
+            if (!Breakable) return;
+
+            myGame.GetWalls().Remove(this);
+
+            //TODO
         }
     }
 }
