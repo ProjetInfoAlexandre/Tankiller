@@ -395,8 +395,6 @@ namespace Tankiller
                 itemPosition.X = position.Width * item.X + (position.Width - itemPosition.Width) / 2;
                 itemPosition.Y = position.Height * item.Y + (int)(ratio * position.Height);
 
-                Console.WriteLine(itemPosition.Y);
-
                 spriteBatch.Draw(texture, itemPosition, Color.White);
             }
 
