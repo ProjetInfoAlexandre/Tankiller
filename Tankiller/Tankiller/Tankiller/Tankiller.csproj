@@ -66,6 +66,7 @@
     <Compile Include="src\Game.cs" />
     <Compile Include="src\Item.cs" />
     <Compile Include="src\Bomb.cs" />
+    <Compile Include="src\ItemType.cs" />
     <Compile Include="src\Tank.cs" />
     <Compile Include="src\Tankiller.cs" />
     <Compile Include="src\Wall.cs" />

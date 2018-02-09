@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace Tankiller.src
 {
@@ -11,12 +8,12 @@ namespace Tankiller.src
         private List<Tank> tanks = new List<Tank>();
         private List<Bomb> bombs = new List<Bomb>();
         private List<Wall> walls = new List<Wall>();
+        private List<Item> items = new List<Item>();
 
         public int Width { get; }
-
         public int Height { get; }
 
-        public Stopwatch timer = new Stopwatch();
+        public Stopwatch Timer = new Stopwatch();
 
         private List<Bomb> missiles = new List<Bomb>();
         public Game(int width, int height)
@@ -46,13 +43,13 @@ namespace Tankiller.src
                 }
             }
 
-            timer.Start();
+            Timer.Start();
         }
 
         ~Game()
         {
-            timer.Stop();
-            timer = null;
+            Timer.Stop();
+            Timer = null;
 
             walls.Clear();
             bombs.Clear();
@@ -74,16 +71,29 @@ namespace Tankiller.src
             return bombs;
         }
 
-        public Bomb PlaceBomb(int x, int y, Tank tank)
+        public List<Item> GetItems()
+        {
+            return items;
+        }
+
+        public Bomb PlaceBomb(int x, int y, Tank tank, int power)
         {
             foreach (Bomb b in bombs) if (b.X == x && b.Y == y) return null;
             if (x <= 0 || x >= Width - 1 || y <= 0 || y >= Height - 1) return null;
 
-            Bomb bomb = new Bomb(x, y, this, tank, timer.ElapsedMilliseconds, 3000);
+            Bomb bomb = new Bomb(x, y, this, tank, Timer.ElapsedMilliseconds, 3000, power);
 
             bombs.Add(bomb);
 
             return bomb;
+        }
+
+        public Item PlaceItem(int x, int y, ItemType type)
+        {
+            Item item = new Item(x, y, this, type);
+            items.Add(item);
+
+            return item;
         }
     }
 }

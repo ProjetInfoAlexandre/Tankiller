@@ -8,9 +8,11 @@ namespace Tankiller
 {
     public class Item : Entity
     {
-        public Item(int x, int y, Game game) : base(x, y, game)
+        public ItemType Type { get; set; }
+
+        public Item(int x, int y, Game game, ItemType type) : base(x, y, game)
         {
-            
+            this.Type = type;
         }
     }
 }

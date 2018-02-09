@@ -59,13 +59,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="vitesse.png">
-      <Name>vitesse</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="bomb.png">
       <Name>bomb</Name>
       <Importer>TextureImporter</Importer>
@@ -87,6 +80,25 @@
     </Compile>
     <Compile Include="menu.png">
       <Name>menu</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="bomb_more.png">
+      <Name>bomb_more</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="bomb_power.png">
+      <Name>bomb_power</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="vitesse.png">
+      <Name>vitesse</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

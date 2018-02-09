@@ -4,12 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using Tankiller.src;
 
 namespace Tankiller
@@ -30,14 +26,17 @@ namespace Tankiller
         private Task finishTask = null;
         private bool Menu = true;
 
-        private Texture2D tank1 = null;
-        private Texture2D tank2 = null;
-        private Texture2D wall = null;
-        private Texture2D background = null;
-        private Texture2D bomb = null;
-        private Texture2D explosion = null;
-        private Texture2D menu = null;
-        private Texture2D commencer = null;
+        private Texture2D Texture_tank1 = null;
+        private Texture2D Texture_tank2 = null;
+        private Texture2D Texture_wall = null;
+        private Texture2D Texture_background = null;
+        private Texture2D Texture_bomb = null;
+        private Texture2D Texture_explosion = null;
+        private Texture2D Texture_menu = null;
+        private Texture2D Texture_commencer = null;
+        private Texture2D Texture_bomb_more = null;
+        private Texture2D Texture_bomb_power = null;
+        private Texture2D Texture_speed = null;
 
         private Dictionary<Wall, long> explodedWalls = new Dictionary<Wall, long>();
         private Dictionary<int[], long> explodedTiles = new Dictionary<int[], long>();
@@ -81,14 +80,17 @@ namespace Tankiller
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            tank1 = Content.Load<Texture2D>("tank1");
-            tank2 = Content.Load<Texture2D>("tank2");
-            wall = Content.Load<Texture2D>("mur");
-            background = Content.Load<Texture2D>("background");
-            bomb = Content.Load<Texture2D>("bomb");
-            explosion = Content.Load<Texture2D>("explosion");
-            menu = Content.Load<Texture2D>("menu");
-            commencer = Content.Load<Texture2D>("commencer");
+            Texture_tank1 = Content.Load<Texture2D>("tank1");
+            Texture_tank2 = Content.Load<Texture2D>("tank2");
+            Texture_wall = Content.Load<Texture2D>("mur");
+            Texture_background = Content.Load<Texture2D>("background");
+            Texture_bomb = Content.Load<Texture2D>("bomb");
+            Texture_explosion = Content.Load<Texture2D>("explosion");
+            Texture_menu = Content.Load<Texture2D>("menu");
+            Texture_commencer = Content.Load<Texture2D>("commencer");
+            Texture_bomb_power = Content.Load<Texture2D>("bomb_power");
+            Texture_bomb_more = Content.Load<Texture2D>("bomb_more");
+            Texture_speed = Content.Load<Texture2D>("vitesse");
         }
 
         /// <summary>
@@ -132,12 +134,12 @@ namespace Tankiller
         {
             if (pause = !pause)
             {
-                game.timer.Stop();
+                game.Timer.Stop();
                 Window.Title = "Tankiller - Pause";
             }
             else
             {
-                game.timer.Start();
+                game.Timer.Start();
                 Window.Title = "Tankiller";
             }
         }
@@ -250,27 +252,27 @@ namespace Tankiller
             List<Wall> walls = explodedWalls.Keys.ToList<Wall>();
             foreach (Wall w in walls)
             {
-                if (game.timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) explodedWalls.Remove(w);
+                if (game.Timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) explodedWalls.Remove(w);
             }
 
             List<int[]> tiles = explodedTiles.Keys.ToList<int[]>();
             foreach (int[] t in tiles)
             {
-                if (game.timer.ElapsedMilliseconds - explodedTiles[t] >= explosion_fade) explodedTiles.Remove(t);
+                if (game.Timer.ElapsedMilliseconds - explodedTiles[t] >= explosion_fade) explodedTiles.Remove(t);
             }
 
             List<Bomb> toRemove = new List<Bomb>();
             foreach (Bomb bomb in game.GetBombs())
             {
-                if (game.timer.ElapsedMilliseconds - bomb.Placed >= bomb.Delay)
+                if (game.Timer.ElapsedMilliseconds - bomb.Placed >= bomb.Delay)
                 {
-                    foreach (int[] t in bomb.getInvolvedPositions()) explodedTiles.Add(t, game.timer.ElapsedMilliseconds);
+                    foreach (int[] t in bomb.getInvolvedPositions()) explodedTiles.Add(t, game.Timer.ElapsedMilliseconds);
 
                     List<Entity> exploded = bomb.Explode();
 
                     foreach (Entity e in exploded)
                     {
-                        if (e is Wall) explodedWalls.Add((Wall)e, game.timer.ElapsedMilliseconds);
+                        if (e is Wall) explodedWalls.Add((Wall)e, game.Timer.ElapsedMilliseconds);
                     }
 
                     if (exploded.Contains(game.GetTanks()[0]))
@@ -310,7 +312,7 @@ namespace Tankiller
         {
             GraphicsDevice.Clear(Color.White);
 
-            double ratio = (double)Math.Abs(30.0 - ((double)game.timer.ElapsedMilliseconds % 2000) / 33.0) / 100.0 + 0.7;
+            double ratio = (double)Math.Abs(30.0 - ((double)game.Timer.ElapsedMilliseconds % 2000) / 33.0) / 100.0 + 0.7;
 
             int width = GraphicsDevice.Viewport.Width;
             int height = GraphicsDevice.Viewport.Height;
@@ -323,7 +325,7 @@ namespace Tankiller
             position.Height = height;
             position.X = position.Y = 0;
 
-            spriteBatch.Draw(menu, position, Color.White);
+            spriteBatch.Draw(Texture_menu, position, Color.White);
 
             position.Height = (int)(ratio * 0.1 * ((double)height));
             position.Width = (int)(3.7 * ((double)position.Height));
@@ -332,7 +334,7 @@ namespace Tankiller
             position.X = width / 2 - position.Width / 2;
             position.Y = height / 2 - position.Height / 2;
 
-            spriteBatch.Draw(commencer, position, Color.White);
+            spriteBatch.Draw(Texture_commencer, position, Color.White);
 
             spriteBatch.End();
         }
@@ -357,38 +359,66 @@ namespace Tankiller
             position.Height = height;
             position.X = position.Y = 0;
 
-            spriteBatch.Draw(background, position, Color.White);
+            spriteBatch.Draw(Texture_background, position, Color.White);
 
 
             position.Width = width / game.Width;
             position.Height = height / game.Height;
 
+            //affichages des murs
             foreach (Wall wall in game.GetWalls())
             {
                 position.X = wall.X * position.Width;
                 position.Y = wall.Y * position.Height;
 
-                if (wall.Breakable) spriteBatch.Draw(this.wall, position, Color.White);
-                else spriteBatch.Draw(this.wall, position, Color.Orange);
+                if (wall.Breakable) spriteBatch.Draw(this.Texture_wall, position, Color.White);
+                else spriteBatch.Draw(this.Texture_wall, position, Color.Orange);
             }
 
+            //affichage des items
+            Rectangle itemPosition = new Rectangle();
+            foreach (Item item in game.GetItems())
+            {
+                Texture2D texture = null;
+                switch (item.Type)
+                {
+                    case ItemType.BOMB: texture = Texture_bomb_more; break;
+                    case ItemType.POWER: texture = Texture_bomb_power; break;
+                    case ItemType.SPEED: texture = Texture_speed; break;
+                }
+
+                itemPosition.Width = (int)(0.8 * position.Width);
+                itemPosition.Height = (int)(0.8 * position.Height);
+
+                double ratio = Math.Abs((int)(20 - game.Timer.ElapsedMilliseconds % 2000 / 50)) / 100.0;
+
+                itemPosition.X = position.Width * item.X + (position.Width - itemPosition.Width) / 2;
+                itemPosition.Y = position.Height * item.Y + (int)(ratio * position.Height);
+
+                Console.WriteLine(itemPosition.Y);
+
+                spriteBatch.Draw(texture, itemPosition, Color.White);
+            }
+
+            //affichages des murs detruits
             foreach (Wall w in explodedWalls.Keys)
             {
-                if (game.timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) continue;
+                if (game.Timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) continue;
 
                 position.X = w.X * position.Width;
                 position.Y = w.Y * position.Height;
 
                 Color color = Color.White;
-                color.G = color.B = (byte)((wall_fade - game.timer.ElapsedMilliseconds + explodedWalls[w]) / 2);
+                color.G = color.B = (byte)((wall_fade - game.Timer.ElapsedMilliseconds + explodedWalls[w]) / 2);
 
-                spriteBatch.Draw(wall, position, color);
+                spriteBatch.Draw(Texture_wall, position, color);
             }
 
+            //affichage des bombes
             Rectangle bombPosition = new Rectangle();
             foreach (Bomb bomb in game.GetBombs())
             {
-                double bombRatio = 0.5 + ((double)Math.Abs(25 - ((game.timer.ElapsedMilliseconds - bomb.Placed) % 2000) / 40)) / 50.0;
+                double bombRatio = 0.5 + ((double)Math.Abs(25 - ((game.Timer.ElapsedMilliseconds - bomb.Placed) % 2000) / 40)) / 50.0;
 
                 bombPosition.Width = (int)(bombRatio * position.Width);
                 bombPosition.Height = (int)(bombRatio * position.Height);
@@ -402,23 +432,24 @@ namespace Tankiller
                 if (bombPosition.Width % 2 == 0) bombPosition.X++;
                 if (bombPosition.Height % 2 == 0) bombPosition.Y++;
 
-                spriteBatch.Draw(this.bomb, bombPosition, Color.White);
+                spriteBatch.Draw(this.Texture_bomb, bombPosition, Color.White);
             }
 
+            //affichage des tanks
             int tank_index = 0;
             foreach (Tank tank in game.GetTanks())
             {
                 ++tank_index;
                 if (!tank.Alive) continue;
 
-                if (tank.LastMovement + tank.MovementDuration <= game.timer.ElapsedMilliseconds)
+                if (tank.LastMovement + tank.MovementDuration <= game.Timer.ElapsedMilliseconds)
                 {
                     position.X = tank.X * position.Width;
                     position.Y = tank.Y * position.Height;
                 }
                 else
                 {
-                    double ratio = ((double)(game.timer.ElapsedMilliseconds - tank.LastMovement)) / tank.MovementDuration;
+                    double ratio = ((double)(game.Timer.ElapsedMilliseconds - tank.LastMovement)) / tank.MovementDuration;
                     position.X = (int)((((double)tank.LastX) + ((double)tank.Direction.GetModX()) * ratio) * (double)position.Width);
                     position.Y = (int)((((double)tank.LastY) + ((double)tank.Direction.GetModY()) * ratio) * (double)position.Height);
                 }
@@ -439,13 +470,14 @@ namespace Tankiller
                         break;
                 }
 
-                Vector2 origin = new Vector2(tank1.Width / 2, tank1.Height / 2);
+                Vector2 origin = new Vector2(Texture_tank1.Width / 2, Texture_tank1.Height / 2);
                 //petit fix (ça commence...)
                 position.Location = position.Center;
 
-                spriteBatch.Draw(tank_index == 1 ? tank1 : tank2, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
+                spriteBatch.Draw(tank_index == 1 ? Texture_tank1 : Texture_tank2, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
             }
 
+            //affichage des explosions
             foreach (int[] t in explodedTiles.Keys)
             {
                 Rectangle explosionPosition = new Rectangle();
@@ -456,16 +488,16 @@ namespace Tankiller
                 explosionPosition.Width = position.Width;
                 explosionPosition.Height = (int)(0.7 * position.Height);
 
-                Vector2 origin = new Vector2(explosion.Width / 2, explosion.Height / 2);
+                Vector2 origin = new Vector2(Texture_explosion.Width / 2, Texture_explosion.Height / 2);
                 explosionPosition.Location = explosionPosition.Center;
 
                 if (t[2] == (int)Direction.TOP)
                 {
-                    spriteBatch.Draw(explosion, explosionPosition, null, Color.White, (float)Math.PI / 2, origin, SpriteEffects.None, 0);
+                    spriteBatch.Draw(Texture_explosion, explosionPosition, null, Color.White, (float)Math.PI / 2, origin, SpriteEffects.None, 0);
                 }
                 else if (t[2] == (int)Direction.LEFT)
                 {
-                    spriteBatch.Draw(explosion, explosionPosition, null, Color.White, 0, origin, SpriteEffects.None, 0);
+                    spriteBatch.Draw(Texture_explosion, explosionPosition, null, Color.White, 0, origin, SpriteEffects.None, 0);
                 }
             }
 

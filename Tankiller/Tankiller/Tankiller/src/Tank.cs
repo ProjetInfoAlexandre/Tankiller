@@ -8,6 +8,8 @@ namespace Tankiller
 {
     public class Tank : Entity
     {
+        public static readonly long MinMovementDuration = 200;
+
         public Direction Direction { get; set; }
         public long LastMovement { get; set; }
         public long MovementDuration { get; set; } = 500;
@@ -15,30 +17,40 @@ namespace Tankiller
         public int LastX { get; set; }
         public int LastY { get; set; }
 
+        private Dictionary<ItemType, int> Items = new Dictionary<ItemType, int>();
+
         public Tank(int x, int y, Game myGame, Direction direction) : base(x, y, myGame)
         {
             Direction = direction;
             LastX = x - direction.GetModX();
             LastY = y - direction.GetModY();
+
+            foreach (ItemType itemType in Enum.GetValues(typeof(ItemType))) Items.Add(itemType, 0);
         }
 
         public void Bomb()
         {
             if (!Alive) return;
+
+            int placedBombs = 0;
+            foreach (Bomb bomb in myGame.GetBombs()) if (bomb.Source == this) ++placedBombs;
+
+            //nombre max de bombes
+            if (placedBombs >= Items[ItemType.BOMB] + 1) return;
         
-            if (LastMovement + MovementDuration > myGame.timer.ElapsedMilliseconds)
+            if (LastMovement + MovementDuration / 2 > myGame.Timer.ElapsedMilliseconds)
             {
                 //encore en mouvement
-                myGame.PlaceBomb(X - Direction.GetModX(), Y - Direction.GetModY(), this);
+                myGame.PlaceBomb(LastX, LastY, this, 1 + Items[ItemType.POWER]);
             }
-            else myGame.PlaceBomb(X, Y, this);
+            else myGame.PlaceBomb(X, Y, this, 1 + Items[ItemType.POWER]);
         }
 
         public void Move(Direction d)
         {
             if (!Alive) return;
 
-            if (myGame.timer.ElapsedMilliseconds < LastMovement + MovementDuration) return;
+            if (myGame.Timer.ElapsedMilliseconds < LastMovement + MovementDuration) return;
 
             //on tourne la tete meme si on ne peut pas s'y deplacer
             Direction = d;
@@ -76,9 +88,29 @@ namespace Tankiller
                 case Direction.LEFT: this.X--; break;
             }
 
-            LastMovement = myGame.timer.ElapsedMilliseconds;
+            LastMovement = myGame.Timer.ElapsedMilliseconds;
 
-            //Tankiller.Update();
+            List<Item> collected = new List<Item>();
+            foreach (Item item in myGame.GetItems())
+            {
+                if (item.X == X && item.Y == Y)
+                {
+                    AddItem(item.Type);
+                    collected.Add(item);
+                }
+            }
+
+            foreach (Item item in collected) myGame.GetItems().Remove(item);
+        }
+
+        public void AddItem(ItemType item)
+        {
+            ++Items[item];
+
+            if (item == ItemType.SPEED)
+            {
+                MovementDuration = Math.Max(MovementDuration - 20, MinMovementDuration);
+            }
         }
     }
 }

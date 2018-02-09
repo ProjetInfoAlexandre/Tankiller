@@ -11,20 +11,34 @@ namespace Tankiller.src
         public long Placed { get; }
         public long Delay { get; set; }
 
-        private int Power = 3;
+        private int Power;
         
-        public Bomb(int x, int y, Game myGame, Tank source, long placed, long delay) : base(x, y, myGame)
+        public Bomb(int x, int y, Game myGame, Tank source, long placed, long delay, int power) : base(x, y, myGame)
         {
             this.Source = source;
             this.Placed = placed;
             this.Delay = delay;
+            this.Power = power;
         }
 
 
         public List<Entity> Explode()
         {
             List<Entity> exploded = new List<Entity>();
-           
+
+            //destruction des items, LAISSE AVANT DESTRUCTION DES MURS
+            List<Item> destroyedItems = new List<Item>();
+            foreach (Item item in myGame.GetItems())
+            {
+                if ((item.X == X && item.Y - Y <= Power && item.Y - Y >= -Power) ||
+                    (item.Y == Y && item.X - X <= Power && item.X - X >= -Power))
+                {
+                    destroyedItems.Add(item);
+                }
+            }
+            foreach (Item item in destroyedItems) myGame.GetItems().Remove(item);
+
+            //destruction des murs
             foreach (Wall wall in myGame.GetWalls())
             {
                 if (!wall.Breakable) continue;
@@ -35,9 +49,9 @@ namespace Tankiller.src
                     exploded.Add(wall);
                 }
             }
+            foreach (Wall w in exploded) w.Destroy();
 
-            foreach (Wall w in exploded) myGame.GetWalls().Remove(w);
-
+            //destruction des tanks
             foreach (Tank tank in myGame.GetTanks())
             {
                 
@@ -47,7 +61,7 @@ namespace Tankiller.src
                     exploded.Add(tank);
                 }
 
-                if (tank.LastMovement + tank.MovementDuration > myGame.timer.ElapsedMilliseconds)
+                if (tank.LastMovement + tank.MovementDuration > myGame.Timer.ElapsedMilliseconds)
                 {
                     //pas fini de bouger donc on regarde aussi la provenance
                     if ((tank.LastX == X && tank.LastY - Y <= Power && tank.LastY - Y >= -Power) ||
@@ -58,14 +72,42 @@ namespace Tankiller.src
                 }
             }
 
+            //activation de la bombe touchée la plus proche dans chaque direction
+            Bomb Top = null, Bot = null, Left = null, Right = null;
             foreach (Bomb bomb in myGame.GetBombs())
             {
-                if ((bomb.X == X && bomb.Y - Y <= Power && bomb.Y - Y >= -Power) ||
-                    (bomb.Y == Y && bomb.X - X <= Power && bomb.X - X >= -Power))
+                if (bomb.X == X)
                 {
-                    bomb.Delay = Math.Min(bomb.Delay, myGame.timer.ElapsedMilliseconds - bomb.Placed + 100);
+                    if (bomb.Y > Y && bomb.Y - Y <= Power)
+                    {
+                        if (Top == null) Top = bomb;
+                        else if (Top.Y > bomb.Y) Top = bomb;
+                    }
+                    else if (bomb.Y < Y && Y - bomb.Y <= Power)
+                    {
+                        if (Bot == null) Bot = bomb;
+                        else if (Bot.Y < bomb.Y) Bot = bomb;
+                    }
+                }
+
+                if (bomb.Y == Y)
+                {
+                    if (bomb.X > X && bomb.X - X <= Power)
+                    {
+                        if (Right == null) Right = bomb;
+                        else if (Right.Y > bomb.Y) Right = bomb;
+                    }
+                    else if (bomb.X < X && X - bomb.X <= Power)
+                    {
+                        if (Left == null) Left = bomb;
+                        else if (Left.X < bomb.X) Left = bomb;
+                    }
                 }
             }
+            if (Top != null) Top.Delay = Math.Min(Top.Delay, myGame.Timer.ElapsedMilliseconds - Top.Placed + 200);
+            if (Bot != null) Bot.Delay = Math.Min(Bot.Delay, myGame.Timer.ElapsedMilliseconds - Bot.Placed + 200);
+            if (Left != null) Left.Delay = Math.Min(Left.Delay, myGame.Timer.ElapsedMilliseconds - Left.Placed + 200);
+            if (Right != null) Right.Delay = Math.Min(Right.Delay, myGame.Timer.ElapsedMilliseconds - Right.Placed + 200);
 
             return exploded;
         }
