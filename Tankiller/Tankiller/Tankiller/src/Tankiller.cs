@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -17,8 +19,16 @@ namespace Tankiller
     /// </summary>
     public class Tankiller : Microsoft.Xna.Framework.Game
     {
+        private static readonly int explosion_fade = 150;
+        private static readonly int wall_fade = 300;
+
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+
+        private bool pause = false, finished = false;
+        private Task finishTask = null;
+        private bool Menu = true;
 
         private Texture2D tank1 = null;
         private Texture2D tank2 = null;
@@ -26,6 +36,8 @@ namespace Tankiller
         private Texture2D background = null;
         private Texture2D bomb = null;
         private Texture2D explosion = null;
+        private Texture2D menu = null;
+        private Texture2D commencer = null;
 
         private Dictionary<Wall, long> explodedWalls = new Dictionary<Wall, long>();
         private Dictionary<int[], long> explodedTiles = new Dictionary<int[], long>();
@@ -37,11 +49,11 @@ namespace Tankiller
             game = new src.Game(20, 20);
 
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = game.Width * 40;
-            graphics.PreferredBackBufferHeight = game.Width * 40;
+            graphics.PreferredBackBufferWidth = 720;
+            graphics.PreferredBackBufferHeight = 720;
 
             Content.RootDirectory = "Content";
-
+            
         }
 
         /// <summary>
@@ -75,6 +87,8 @@ namespace Tankiller
             background = Content.Load<Texture2D>("background");
             bomb = Content.Load<Texture2D>("bomb");
             explosion = Content.Load<Texture2D>("explosion");
+            menu = Content.Load<Texture2D>("menu");
+            commencer = Content.Load<Texture2D>("commencer");
         }
 
         /// <summary>
@@ -93,62 +107,8 @@ namespace Tankiller
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            MouseState mouseState = Mouse.GetState();
-            KeyboardState keyboardState = Keyboard.GetState();
-
-            //Quitter
-            if (keyboardState.IsKeyDown(Keys.Escape)) this.Exit();
-
-            // TODO: Add your update logic here
-            if (keyboardState.IsKeyDown(Keys.Up))
-            {
-                game.GetTanks()[0].Move(Direction.TOP);
-            }
-            else if (keyboardState.IsKeyDown(Keys.Down))
-            {
-                game.GetTanks()[0].Move(Direction.BOT);
-            }
-            else if (keyboardState.IsKeyDown(Keys.Left))
-            {
-                game.GetTanks()[0].Move(Direction.LEFT);
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right))
-            {
-                game.GetTanks()[0].Move(Direction.RIGHT);
-            }
-
-            if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                game.GetTanks()[0].Bomb();
-            }
-
-            List<Wall> walls = explodedWalls.Keys.ToList<Wall>();
-            foreach (Wall w in walls)
-            {
-                if (game.timer.ElapsedMilliseconds - explodedWalls[w] >= 300) explodedWalls.Remove(w);
-            }
-
-            List<int[]> tiles = explodedTiles.Keys.ToList<int[]>();
-            foreach (int[] t in tiles)
-            {
-                if (game.timer.ElapsedMilliseconds - explodedTiles[t] >= 200) explodedTiles.Remove(t);
-            }
-
-            List<Bomb> toRemove = new List<Bomb>();
-            foreach (Bomb bomb in game.GetBombs())
-            {
-                if (game.timer.ElapsedMilliseconds - bomb.Placed >= bomb.Delay)
-                {
-                    foreach (int[] t in bomb.getInvolvedPositions()) explodedTiles.Add(t, game.timer.ElapsedMilliseconds);
-
-                    List<Entity> exploded = bomb.Explode();
-
-                    foreach (Wall w in exploded) explodedWalls.Add(w, game.timer.ElapsedMilliseconds);
-
-                    toRemove.Add(bomb);
-                }
-            }
-            foreach (Bomb b in toRemove) game.GetBombs().Remove(b);
+            if (Menu) UpdateMenu();
+            else UpdateJeu(gameTime);            
 
 
             //LAISSER ABSOLUEMENT
@@ -161,8 +121,228 @@ namespace Tankiller
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            if (Menu) DrawMenu(gameTime);
+            else DrawGame(gameTime);
+
+
+            base.Draw(gameTime);
+        }
+
+        protected void Pause()
+        {
+            if (pause = !pause)
+            {
+                game.timer.Stop();
+                Window.Title = "Tankiller - Pause";
+            }
+            else
+            {
+                game.timer.Start();
+                Window.Title = "Tankiller";
+            }
+        }
+
+        protected void Restart()
+        {
+            game = null;
+            pause = false;
+            finished = false;
+            finishTask = null;
+
+            explodedTiles.Clear();
+            explodedWalls.Clear();
+
+            game = new src.Game(20, 20);
+        }
+
+        protected void UpdateMenu()
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            if (keyboardState.IsKeyDown(Keys.Enter))
+            {
+                Menu = false;
+                key_enter = true;
+            }
+        }
+
+        private long lastPauseKey = 0;
+        private bool key_space = false;
+        private bool key_esc = false;
+        private bool key_enter = false;
+
+        protected void UpdateJeu(GameTime gameTime)
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            if (!finished)
+            {
+                ///pause
+                if (keyboardState.IsKeyDown(Keys.Escape) && !key_esc)
+                {
+                    key_esc = true;
+
+                    if (gameTime.TotalGameTime.TotalMilliseconds > lastPauseKey + 500)
+                    {
+                        Pause();
+                        lastPauseKey = (long)gameTime.TotalGameTime.TotalMilliseconds;
+                    }
+                }
+                else if (!keyboardState.IsKeyDown(Keys.Escape)) key_esc = false;
+
+                //joueur1
+                if (keyboardState.IsKeyDown(Keys.Z))
+                {
+                    game.GetTanks()[0].Move(Direction.TOP);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.S))
+                {
+                    game.GetTanks()[0].Move(Direction.BOT);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.Q))
+                {
+                    game.GetTanks()[0].Move(Direction.LEFT);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.D))
+                {
+                    game.GetTanks()[0].Move(Direction.RIGHT);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.Space) && !key_space)
+                {
+                    game.GetTanks()[0].Bomb();
+                    key_space = true;
+                }
+                else if (!keyboardState.IsKeyDown(Keys.Space)) key_space = false;
+
+                //joueur2
+                if (keyboardState.IsKeyDown(Keys.Up))
+                {
+                    game.GetTanks()[1].Move(Direction.TOP);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.Down))
+                {
+                    game.GetTanks()[1].Move(Direction.BOT);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.Left))
+                {
+                    game.GetTanks()[1].Move(Direction.LEFT);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.Right))
+                {
+                    game.GetTanks()[1].Move(Direction.RIGHT);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.Enter) && !key_enter)
+                {
+                    game.GetTanks()[1].Bomb();
+                    key_enter = true;
+                }
+                else if (!keyboardState.IsKeyDown(Keys.Enter)) key_enter = false;
+            }
+
+            List<Wall> walls = explodedWalls.Keys.ToList<Wall>();
+            foreach (Wall w in walls)
+            {
+                if (game.timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) explodedWalls.Remove(w);
+            }
+
+            List<int[]> tiles = explodedTiles.Keys.ToList<int[]>();
+            foreach (int[] t in tiles)
+            {
+                if (game.timer.ElapsedMilliseconds - explodedTiles[t] >= explosion_fade) explodedTiles.Remove(t);
+            }
+
+            List<Bomb> toRemove = new List<Bomb>();
+            foreach (Bomb bomb in game.GetBombs())
+            {
+                if (game.timer.ElapsedMilliseconds - bomb.Placed >= bomb.Delay)
+                {
+                    foreach (int[] t in bomb.getInvolvedPositions()) explodedTiles.Add(t, game.timer.ElapsedMilliseconds);
+
+                    List<Entity> exploded = bomb.Explode();
+
+                    foreach (Entity e in exploded)
+                    {
+                        if (e is Wall) explodedWalls.Add((Wall)e, game.timer.ElapsedMilliseconds);
+                    }
+
+                    if (exploded.Contains(game.GetTanks()[0]))
+                    {
+                        game.GetTanks()[0].Alive = false;
+                        finished = true;
+                    }
+                    if (exploded.Contains(game.GetTanks()[1]))
+                    {
+                        game.GetTanks()[1].Alive = false;
+                        finished = true;
+                    }
+
+                    toRemove.Add(bomb);
+                }
+            }
+            foreach (Bomb b in toRemove) game.GetBombs().Remove(b);
+
+            if (finished && finishTask == null)
+            {
+                finishTask = Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(500);
+
+                    if (game.GetTanks()[0].Alive)
+                        System.Windows.Forms.MessageBox.Show("Victoire du Joueur 1", "Boom !");
+                    else if (game.GetTanks()[1].Alive)
+                        System.Windows.Forms.MessageBox.Show("Victoire du Joueur 2", "Boom !");
+                    else System.Windows.Forms.MessageBox.Show("Egalité", "Boom !");
+
+                    Restart();
+                });
+            }
+        }
+
+        protected void DrawMenu(GameTime gameTime)
+        {
             GraphicsDevice.Clear(Color.White);
+
+            double ratio = (double)Math.Abs(30.0 - ((double)game.timer.ElapsedMilliseconds % 2000) / 33.0) / 100.0 + 0.7;
+
+            int width = GraphicsDevice.Viewport.Width;
+            int height = GraphicsDevice.Viewport.Height;
+
+            spriteBatch.Begin();
+
+            Rectangle position = new Rectangle();
+
+            position.Width = width;
+            position.Height = height;
+            position.X = position.Y = 0;
+
+            spriteBatch.Draw(menu, position, Color.White);
+
+            position.Height = (int)(ratio * 0.1 * ((double)height));
+            position.Width = (int)(3.7 * ((double)position.Height));
             
+
+            position.X = width / 2 - position.Width / 2;
+            position.Y = height / 2 - position.Height / 2;
+
+            spriteBatch.Draw(commencer, position, Color.White);
+
+            spriteBatch.End();
+        }
+
+        protected void DrawGame(GameTime gameTime)
+        {
+            if (pause) base.Draw(gameTime);
+
+            GraphicsDevice.Clear(Color.White);
+
             // TODO: Add your drawing code here
             int width = GraphicsDevice.Viewport.Width;
             int height = GraphicsDevice.Viewport.Height;
@@ -179,7 +359,7 @@ namespace Tankiller
 
             spriteBatch.Draw(background, position, Color.White);
 
-            
+
             position.Width = width / game.Width;
             position.Height = height / game.Height;
 
@@ -191,16 +371,16 @@ namespace Tankiller
                 if (wall.Breakable) spriteBatch.Draw(this.wall, position, Color.White);
                 else spriteBatch.Draw(this.wall, position, Color.Orange);
             }
-            
+
             foreach (Wall w in explodedWalls.Keys)
             {
-                if (game.timer.ElapsedMilliseconds - explodedWalls[w] >= 300) continue;
+                if (game.timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) continue;
 
                 position.X = w.X * position.Width;
                 position.Y = w.Y * position.Height;
 
                 Color color = Color.White;
-                color.G = color.B = (byte)((300 - game.timer.ElapsedMilliseconds + explodedWalls[w]) / 2);
+                color.G = color.B = (byte)((wall_fade - game.timer.ElapsedMilliseconds + explodedWalls[w]) / 2);
 
                 spriteBatch.Draw(wall, position, color);
             }
@@ -213,20 +393,24 @@ namespace Tankiller
                 bombPosition.Width = (int)(bombRatio * position.Width);
                 bombPosition.Height = (int)(bombRatio * position.Height);
 
-                if (bombPosition.Width % 2 == 0) bombPosition.Width++;
-                if (bombPosition.Height % 2 == 0) bombPosition.Height++;
-
                 position.X = bomb.X * position.Width;
                 position.Y = bomb.Y * position.Height;
 
                 bombPosition.X = position.Center.X - bombPosition.Width / 2;
                 bombPosition.Y = position.Center.Y - bombPosition.Height / 2;
 
+                if (bombPosition.Width % 2 == 0) bombPosition.X++;
+                if (bombPosition.Height % 2 == 0) bombPosition.Y++;
+
                 spriteBatch.Draw(this.bomb, bombPosition, Color.White);
             }
 
+            int tank_index = 0;
             foreach (Tank tank in game.GetTanks())
             {
+                ++tank_index;
+                if (!tank.Alive) continue;
+
                 if (tank.LastMovement + tank.MovementDuration <= game.timer.ElapsedMilliseconds)
                 {
                     position.X = tank.X * position.Width;
@@ -235,8 +419,8 @@ namespace Tankiller
                 else
                 {
                     double ratio = ((double)(game.timer.ElapsedMilliseconds - tank.LastMovement)) / tank.MovementDuration;
-                    position.X = (int) ((((double)tank.X - tank.Direction.GetModX()) + ((double)tank.Direction.GetModX()) * ratio) * (double)position.Width);
-                    position.Y = (int) ((((double)tank.Y - tank.Direction.GetModY()) + ((double)tank.Direction.GetModY()) * ratio) * (double)position.Height);
+                    position.X = (int)((((double)tank.LastX) + ((double)tank.Direction.GetModX()) * ratio) * (double)position.Width);
+                    position.Y = (int)((((double)tank.LastY) + ((double)tank.Direction.GetModY()) * ratio) * (double)position.Height);
                 }
 
                 float rotation = 0;
@@ -259,7 +443,7 @@ namespace Tankiller
                 //petit fix (ça commence...)
                 position.Location = position.Center;
 
-                spriteBatch.Draw(tank1, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
+                spriteBatch.Draw(tank_index == 1 ? tank1 : tank2, position, null, Color.White, rotation, origin, SpriteEffects.None, 0);
             }
 
             foreach (int[] t in explodedTiles.Keys)
@@ -286,10 +470,7 @@ namespace Tankiller
             }
 
             spriteBatch.End();
-
-
-
-            base.Draw(gameTime);
         }
+
     }
 }

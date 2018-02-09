@@ -11,14 +11,21 @@ namespace Tankiller
         public Direction Direction { get; set; }
         public long LastMovement { get; set; }
         public long MovementDuration { get; set; } = 500;
+        public bool Alive { get; set; } = true;
+        public int LastX { get; set; }
+        public int LastY { get; set; }
 
-        public Tank(int x , int y, Game myGame) : base(x, y, myGame)
+        public Tank(int x, int y, Game myGame, Direction direction) : base(x, y, myGame)
         {
-            Direction = Direction.TOP;
+            Direction = direction;
+            LastX = x - direction.GetModX();
+            LastY = y - direction.GetModY();
         }
 
         public void Bomb()
         {
+            if (!Alive) return;
+        
             if (LastMovement + MovementDuration > myGame.timer.ElapsedMilliseconds)
             {
                 //encore en mouvement
@@ -29,6 +36,8 @@ namespace Tankiller
 
         public void Move(Direction d)
         {
+            if (!Alive) return;
+
             if (myGame.timer.ElapsedMilliseconds < LastMovement + MovementDuration) return;
 
             //on tourne la tete meme si on ne peut pas s'y deplacer
@@ -55,6 +64,9 @@ namespace Tankiller
             {
                 if (bomb.X == X + d.GetModX() && bomb.Y == Y + d.GetModY()) return;
             }
+
+            LastX = X;
+            LastY = Y;
 
             switch (d)
             {

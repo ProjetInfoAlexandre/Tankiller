@@ -9,7 +9,7 @@ namespace Tankiller.src
     {
         public Tank Source { get; }
         public long Placed { get; }
-        public long Delay { get; }
+        public long Delay { get; set; }
 
         private int Power = 3;
         
@@ -29,24 +29,43 @@ namespace Tankiller.src
             {
                 if (!wall.Breakable) continue;
 
-                if (wall.X == X)
+                if ((wall.X == X && wall.Y - Y <= Power && wall.Y - Y >= -Power) ||
+                    (wall.Y == Y && wall.X - X <= Power && wall.X - X >= -Power))
                 {
-                    if (wall.Y - Y <= Power && wall.Y - Y >= -Power)
-                    {
-                        exploded.Add(wall);
-                    }
-                }
-                else if (wall.Y == Y)
-                {
-                    if (wall.X - X <= Power && wall.X - X >= -Power)
-                    {
-                        exploded.Add(wall);
-                    }
+                    exploded.Add(wall);
                 }
             }
 
             foreach (Wall w in exploded) myGame.GetWalls().Remove(w);
 
+            foreach (Tank tank in myGame.GetTanks())
+            {
+                
+                if ((tank.X == X && tank.Y - Y <= Power && tank.Y - Y >= -Power) ||
+                    (tank.Y == Y && tank.X - X <= Power && tank.X - X >= -Power))
+                {
+                    exploded.Add(tank);
+                }
+
+                if (tank.LastMovement + tank.MovementDuration > myGame.timer.ElapsedMilliseconds)
+                {
+                    //pas fini de bouger donc on regarde aussi la provenance
+                    if ((tank.LastX == X && tank.LastY - Y <= Power && tank.LastY - Y >= -Power) ||
+                        (tank.LastY == Y && tank.LastX - X <= Power && tank.LastX - X >= -Power))
+                    {
+                        exploded.Add(tank);
+                    }
+                }
+            }
+
+            foreach (Bomb bomb in myGame.GetBombs())
+            {
+                if ((bomb.X == X && bomb.Y - Y <= Power && bomb.Y - Y >= -Power) ||
+                    (bomb.Y == Y && bomb.X - X <= Power && bomb.X - X >= -Power))
+                {
+                    bomb.Delay = Math.Min(bomb.Delay, myGame.timer.ElapsedMilliseconds - bomb.Placed + 100);
+                }
+            }
 
             return exploded;
         }

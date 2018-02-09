@@ -27,12 +27,10 @@ namespace Tankiller.src
             this.Width = width;
             this.Height = height;
 
-            Tank t = new Tank(1, height / 2, this);
-            t.Direction = Direction.RIGHT;
+            Tank t = new Tank(1, height / 2, this, Direction.RIGHT);
             tanks.Add(t);
 
-            t = new Tank(width - 2, height / 2, this);
-            t.Direction = Direction.LEFT;
+            t = new Tank(width - 2, height / 2, this, Direction.LEFT);
             tanks.Add(t);
 
             for (int i = 0; i < height; ++i)
@@ -54,6 +52,11 @@ namespace Tankiller.src
         ~Game()
         {
             timer.Stop();
+            timer = null;
+
+            walls.Clear();
+            bombs.Clear();
+            tanks.Clear();
         }
 
         public List<Tank> GetTanks()
@@ -74,6 +77,7 @@ namespace Tankiller.src
         public Bomb PlaceBomb(int x, int y, Tank tank)
         {
             foreach (Bomb b in bombs) if (b.X == x && b.Y == y) return null;
+            if (x <= 0 || x >= Width - 1 || y <= 0 || y >= Height - 1) return null;
 
             Bomb bomb = new Bomb(x, y, this, tank, timer.ElapsedMilliseconds, 3000);
 
