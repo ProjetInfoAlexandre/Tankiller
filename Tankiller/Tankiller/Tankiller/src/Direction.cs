@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Tankiller.src
 {
+    /// <summary>
+    /// Représente une diréction en 2D
+    /// </summary>
     public enum Direction
     {
         TOP, BOT, RIGHT, LEFT
@@ -12,6 +15,11 @@ namespace Tankiller.src
 
     static class DirectionMethods
     {
+        /// <summary>
+        /// Renvoie le composant X de cette direction
+        /// </summary>
+        /// <param name="direction">Direction en question</param>
+        /// <returns>-1 pour gauche, 1 pour droite, 0 pour aucun</returns>
         public static int GetModX(this Direction direction)
         {
             switch (direction)
@@ -23,6 +31,11 @@ namespace Tankiller.src
             }
         }
 
+        /// <summary>
+        /// Renvoie le composant Y de cette direction
+        /// </summary>
+        /// <param name="direction">Direction en question</param>
+        /// <returns>-1 pour haut, 1 pour bas, 0 pour aucun</returns>
         public static int GetModY(this Direction direction)
         {
             switch (direction)

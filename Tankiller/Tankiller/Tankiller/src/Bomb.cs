@@ -7,10 +7,22 @@ namespace Tankiller.src
 {
     public class Bomb : Entity
     {
+        /// <summary>
+        /// Source ayant posée cette bombe
+        /// </summary>
         public Tank Source { get; }
+        /// <summary>
+        /// Temps en milisecondes auquel cette bombe a été placée
+        /// </summary>
         public long Placed { get; }
+        /// <summary>
+        /// Temps en milisecondes depuis sa création avant explosion
+        /// </summary>
         public long Delay { get; set; }
 
+        /// <summary>
+        /// Puissance de la bombe
+        /// </summary>
         private int Power;
         
         public Bomb(int x, int y, Game myGame, Tank source, long placed, long delay, int power) : base(x, y, myGame)
@@ -21,12 +33,15 @@ namespace Tankiller.src
             this.Power = power;
         }
 
-
+        /// <summary>
+        /// Déclanche la bombe
+        /// </summary>
+        /// <returns>Liste des entités touchées par l'explosion</returns>
         public List<Entity> Explode()
         {
             List<Entity> exploded = new List<Entity>();
 
-            //destruction des items, LAISSE AVANT DESTRUCTION DES MURS
+            //destruction des items, LAISSER AVANT DESTRUCTION DES MURS
             List<Item> destroyedItems = new List<Item>();
             foreach (Item item in myGame.GetItems())
             {
@@ -112,6 +127,11 @@ namespace Tankiller.src
             return exploded;
         }
 
+        /// <summary>
+        /// Renvoie un tableau de couples de int représentant les coordonnées X et Y
+        /// des cases atteintes par l'explosion
+        /// </summary>
+        /// <returns>Tableau d'int[3] de paires d'int</returns>
         public List<int[]> getInvolvedPositions()
         {
             List<int[]> involved = new List<int[]>();

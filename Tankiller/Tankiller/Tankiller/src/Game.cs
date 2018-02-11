@@ -10,9 +10,18 @@ namespace Tankiller.src
         private List<Wall> walls = new List<Wall>();
         private List<Item> items = new List<Item>();
 
+        /// <summary>
+        /// Largeur du jeu
+        /// </summary>
         public int Width { get; }
+        /// <summary>
+        /// Hauteur du jeu
+        /// </summary>
         public int Height { get; }
 
+        /// <summary>
+        /// Chronomêtre lancé au début de la partie
+        /// </summary>
         public Stopwatch Timer = new Stopwatch();
 
         private List<Bomb> missiles = new List<Bomb>();
@@ -56,26 +65,50 @@ namespace Tankiller.src
             tanks.Clear();
         }
 
+        /// <summary>
+        /// Renvoie les tanks (vivant ET morts) de la partie
+        /// </summary>
+        /// <returns>Liste des tanks</returns>
         public List<Tank> GetTanks()
         {
             return tanks;
         }
 
+        /// <summary>
+        /// Renvoie les murs (non détruits) de la partie
+        /// </summary>
+        /// <returns>Liste des murs</returns>
         public List<Wall> GetWalls()
         {
             return walls;
         }
 
+        /// <summary>
+        /// Renvoie les bombes (placées) de la partie
+        /// </summary>
+        /// <returns>Liste des bombes</returns>
         public List<Bomb> GetBombs()
         {
             return bombs;
         }
 
+        /// <summary>
+        /// Renvoie les entités de la partie
+        /// </summary>
+        /// <returns>Liste des entitées de la partie</returns>
         public List<Item> GetItems()
         {
             return items;
         }
 
+        /// <summary>
+        /// Place une bombe aux coordonnées données
+        /// </summary>
+        /// <param name="x">Position X de la bombe à placer</param>
+        /// <param name="y">Position Y de la bombe à placer</param>
+        /// <param name="tank">Tank source de la bombe</param>
+        /// <param name="power">Puissance de la bombe</param>
+        /// <returns>Bombe placée, null si impossible à placer</returns>
         public Bomb PlaceBomb(int x, int y, Tank tank, int power)
         {
             foreach (Bomb b in bombs) if (b.X == x && b.Y == y) return null;
@@ -88,6 +121,13 @@ namespace Tankiller.src
             return bomb;
         }
 
+        /// <summary>
+        /// Place un item aux coordonnées données
+        /// </summary>
+        /// <param name="x">Position X de l'item à placer</param>
+        /// <param name="y">Position Y de l'item à placer</param>
+        /// <param name="type">Type de l'item</param>
+        /// <returns>Item placé</returns>
         public Item PlaceItem(int x, int y, ItemType type)
         {
             Item item = new Item(x, y, this, type);

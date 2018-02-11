@@ -130,6 +130,9 @@ namespace Tankiller
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// Met le jeu en pause
+        /// </summary>
         protected void Pause()
         {
             if (pause = !pause)
@@ -144,6 +147,9 @@ namespace Tankiller
             }
         }
 
+        /// <summary>
+        /// Relance une nouvelle partie
+        /// </summary>
         protected void Restart()
         {
             game = null;
@@ -157,6 +163,9 @@ namespace Tankiller
             game = new src.Game(20, 20);
         }
 
+        /// <summary>
+        /// Mise à jour de l'application sur le menu
+        /// </summary>
         protected void UpdateMenu()
         {
             KeyboardState keyboardState = Keyboard.GetState();
@@ -168,11 +177,18 @@ namespace Tankiller
             }
         }
 
+        /// <summary>
+        /// Variables utiles pour éviter le spam des controles
+        /// </summary>
         private long lastPauseKey = 0;
         private bool key_space = false;
         private bool key_esc = false;
         private bool key_enter = false;
 
+        /// <summary>
+        /// Mise à jour de l'application en jeu
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected void UpdateJeu(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
@@ -249,18 +265,21 @@ namespace Tankiller
                 else if (!keyboardState.IsKeyDown(Keys.Enter)) key_enter = false;
             }
 
+            //affichage animation murs explosés
             List<Wall> walls = explodedWalls.Keys.ToList<Wall>();
             foreach (Wall w in walls)
             {
                 if (game.Timer.ElapsedMilliseconds - explodedWalls[w] >= wall_fade) explodedWalls.Remove(w);
             }
 
+            //affichage animation explosion
             List<int[]> tiles = explodedTiles.Keys.ToList<int[]>();
             foreach (int[] t in tiles)
             {
                 if (game.Timer.ElapsedMilliseconds - explodedTiles[t] >= explosion_fade) explodedTiles.Remove(t);
             }
 
+            //calcul des bombes (explosion et suppression)
             List<Bomb> toRemove = new List<Bomb>();
             foreach (Bomb bomb in game.GetBombs())
             {
@@ -291,6 +310,7 @@ namespace Tankiller
             }
             foreach (Bomb b in toRemove) game.GetBombs().Remove(b);
 
+            //test partie terminée
             if (finished && finishTask == null)
             {
                 finishTask = Task.Factory.StartNew(() =>
@@ -308,6 +328,10 @@ namespace Tankiller
             }
         }
 
+        /// <summary>
+        /// Dessin du menu
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected void DrawMenu(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.White);
@@ -339,6 +363,10 @@ namespace Tankiller
             spriteBatch.End();
         }
 
+        /// <summary>
+        /// Dessin du jeu
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected void DrawGame(GameTime gameTime)
         {
             if (pause) base.Draw(gameTime);
